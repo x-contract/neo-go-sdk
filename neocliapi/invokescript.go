@@ -1,4 +1,4 @@
-package neoapi
+package neocliapi
 
 import (
 	"encoding/hex"

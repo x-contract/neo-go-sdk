@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/hex"
 	"errors"
+
 	"github.com/terender/neo-go-sdk/neoutils"
-	"utils"
 )
 
 // The AssetId of some neo token
@@ -116,7 +116,7 @@ func (extra *InvocationExtraData) Bytes() []byte {
 	extra.ScriptLength.Value = uint64(len(extra.Script))
 	buff.Write(extra.ScriptLength.Bytes())
 	buff.Write(extra.Script)
-	//utils.WriteUint64ToBuffer(buff, uint64(extra.GasConsumed))
+	//neoutils.WriteUint64ToBuffer(buff, uint64(extra.GasConsumed))
 	return buff.Bytes()
 }
 
@@ -139,8 +139,8 @@ type NeoTransaction struct {
 	ScriptsCount neoutils.VarInt
 	Scripts      []Script
 
-	dirty       bool
-	txid        string
+	dirty bool
+	//txid        string
 	unsingedraw []byte
 	witness     []byte
 }
@@ -167,7 +167,7 @@ func (tx *NeoTransaction) AppendInputByTxHash(transactionID string, index uint16
 	if !hash.IsValid() {
 		return errors.New("NeoTransaction.AppendInput invalid transactionID")
 	}
-	hash = utils.Reverse(hash)
+	hash = neoutils.Reverse(hash)
 	tx.Inputs = append(tx.Inputs, TxInput{PrevHash: hash, PrevIndex: index})
 	tx.dirty = true
 	return nil
@@ -189,7 +189,7 @@ func (tx *NeoTransaction) AppendOutputByAddrString(address string, assetID strin
 	if !assetHash.IsValid() {
 		return errors.New("NeoTransaction.AppendOutputByAddString invalid assetID")
 	}
-	assetHash = utils.Reverse(assetHash)
+	assetHash = neoutils.Reverse(assetHash)
 
 	tx.Outputs = append(tx.Outputs, TxOutput{AssetID: assetHash, ScriptHash: addr.ScripHash, Value: count})
 	tx.dirty = true
@@ -234,14 +234,14 @@ func (tx *NeoTransaction) UnsignedRawTransaction() []byte {
 	buff.Write(tx.InputsCount.Bytes())
 	for i := 0; i < len(tx.Inputs); i++ {
 		buff.Write(tx.Inputs[i].PrevHash)
-		utils.WriteUint16ToBuffer(buff, tx.Inputs[i].PrevIndex)
+		neoutils.WriteUint16ToBuffer(buff, tx.Inputs[i].PrevIndex)
 	}
 
 	tx.OutputsCount.Value = uint64(len(tx.Outputs))
 	buff.Write(tx.OutputsCount.Bytes())
 	for i := 0; i < len(tx.Outputs); i++ {
 		buff.Write(tx.Outputs[i].AssetID)
-		utils.WriteUint64ToBuffer(buff, uint64(tx.Outputs[i].Value))
+		neoutils.WriteUint64ToBuffer(buff, uint64(tx.Outputs[i].Value))
 		buff.Write(tx.Outputs[i].ScriptHash)
 	}
 	tx.unsingedraw = buff.Bytes()
@@ -250,12 +250,12 @@ func (tx *NeoTransaction) UnsignedRawTransaction() []byte {
 
 // TXID 返回一个交易的交易ID
 func (tx *NeoTransaction) TXID() string {
-	if len(tx.txid) != 0 {
-		return tx.txid
-	}
+	// if len(tx.txid) != 0 {
+	// 	return tx.txid
+	// }
 	txid := neoutils.Hash256(tx.UnsignedRawTransaction())
-	tx.txid = hex.EncodeToString(utils.Reverse(txid))
-	return tx.txid
+	//tx.txid = hex.EncodeToString(neoutils.Reverse(txid))
+	return hex.EncodeToString(neoutils.Reverse(txid))
 }
 
 // AppendWitness 向交易添加一个鉴证人。一个独立的鉴证人有一个鉴证人脚本，包括一个压栈脚本和一个鉴权脚本

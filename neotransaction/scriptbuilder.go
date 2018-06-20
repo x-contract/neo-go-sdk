@@ -2,10 +2,11 @@ package neotransaction
 
 import (
 	"bytes"
+	"fmt"
 	"math/big"
+
 	"github.com/terender/neo-go-sdk/neotransaction/OpCode"
 	"github.com/terender/neo-go-sdk/neoutils"
-	"utils"
 )
 
 // ScriptBuilder NEO 智能合约脚本构建器
@@ -32,7 +33,7 @@ func (sb *ScriptBuilder) EmitOpArgs(op OpCode.OPCODE, args []byte) {
 // EmitAppCall 在脚本构建器中加入一条合约调用指令，参数为被调用的合约的脚本哈希
 func (sb *ScriptBuilder) EmitAppCall(scriptHash neoutils.HASH160) {
 	sb.Emit(OpCode.APPCALL)
-	sb.buff.Write(utils.Reverse(scriptHash))
+	sb.buff.Write(neoutils.Reverse(scriptHash))
 }
 
 // EmitPushBool 在脚本构建器中加入一条压栈布尔值的指令
@@ -55,11 +56,11 @@ func (sb *ScriptBuilder) EmitPushBytes(arg []byte) {
 		sb.buff.Write(arg)
 	} else if len(arg) <= 0xffff {
 		sb.Emit(OpCode.PUSHDATA2)
-		utils.WriteUint16ToBuffer(&sb.buff, uint16(len(arg)))
+		neoutils.WriteUint16ToBuffer(&sb.buff, uint16(len(arg)))
 		sb.buff.Write(arg)
 	} else {
 		sb.Emit(OpCode.PUSHDATA4)
-		utils.WriteUint32ToBuffer(&sb.buff, uint32(len(arg)))
+		neoutils.WriteUint32ToBuffer(&sb.buff, uint32(len(arg)))
 		sb.buff.Write(arg)
 	}
 }
@@ -78,13 +79,52 @@ func (sb *ScriptBuilder) EmitPushNumber(arg int64) {
 		sb.Emit(OpCode.PUSH1 - 1 + OpCode.OPCODE(arg))
 		return
 	}
-	bytes := utils.Reverse(big.NewInt(arg).Bytes())
+	bytes := neoutils.Reverse(big.NewInt(arg).Bytes())
 	sb.EmitPushBytes(bytes)
 }
 
 // EmitPushString 在脚本构建器中加入一条压栈字符串的指令，压栈字符串实际上是压栈字节数组
 func (sb *ScriptBuilder) EmitPushString(arg string) {
 	sb.EmitPushBytes([]byte(arg))
+}
+
+// EmitPushArray 在脚本构建器中加入一条压栈数组的指令，数组的元素可以是 HASH256 HASH160 string []byte number bool
+// 将数组压栈需要将数组元素按照从右至左压入栈中，然后压入数组长度，最后压栈 Pack 指令
+func (sb *ScriptBuilder) EmitPushArray(arg []interface{}) error {
+	for i := len(arg) - 1; i >= 0; i-- {
+		arg := arg[i]
+		switch v := arg.(type) {
+		case neoutils.HASH256:
+			sb.EmitPushBytes(neoutils.Reverse(v))
+		case neoutils.HASH160:
+			sb.EmitPushBytes(neoutils.Reverse(v))
+		case []byte:
+			sb.EmitPushBytes(v)
+		case uint64:
+			sb.EmitPushNumber(int64(v))
+		case int64:
+			sb.EmitPushNumber(int64(v))
+		case uint32:
+			sb.EmitPushNumber(int64(v))
+		case int32:
+			sb.EmitPushNumber(int64(v))
+		case uint16:
+			sb.EmitPushNumber(int64(v))
+		case int16:
+			sb.EmitPushNumber(int64(v))
+		case byte:
+			sb.EmitPushNumber(int64(v))
+		case string:
+			sb.EmitPushString(v)
+		case bool:
+			sb.EmitPushBool(v)
+		default:
+			return fmt.Errorf(`EmitPushArray Error: script params[%T] not supported`, v)
+		}
+	}
+	sb.EmitPushNumber(int64(len(arg)))
+	sb.Emit(OpCode.PACK)
+	return nil
 }
 
 // BuildBasicWitnessScript 创建一个基础的鉴证人脚本,包含基础压栈脚本和基础鉴权脚本

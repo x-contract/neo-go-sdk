@@ -1,4 +1,4 @@
-package neoapi
+package neocliapi
 
 import (
 	"log"
@@ -15,7 +15,7 @@ var NEOCLIURL = ``
 var NewBlockChan = make(chan map[string]interface{})
 
 // StartSpider 开始监听NEO节点
-func StartSpider(cliurl string, fromHeight uint64) {
+func StartSpider(cliurl string, fromHeight uint64) chan map[string]interface{} {
 	NEOCLIURL = cliurl
 	CurrBlockHeight = fromHeight
 	log.Printf("neoapi: fetch init block height[%v]\n", CurrBlockHeight)
@@ -25,6 +25,7 @@ func StartSpider(cliurl string, fromHeight uint64) {
 			time.Sleep(3 * time.Second)
 		}
 	}()
+	return NewBlockChan
 }
 
 func fetchBlock() {

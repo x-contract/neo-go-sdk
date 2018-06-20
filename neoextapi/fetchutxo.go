@@ -1,4 +1,4 @@
-package neoapi
+package neoextapi
 
 import (
 	"encoding/hex"
@@ -9,7 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"utils"
+
+	"github.com/terender/neo-go-sdk/neoutils"
 
 	"github.com/terender/neo-go-sdk/neotransaction"
 )
@@ -60,7 +61,7 @@ func FetchUTXO(url string, address *neotransaction.Address, assetFilter string) 
 		utxo := &neotransaction.UTXO{}
 		txid := u["txid"].(string)
 		utxo.TxHash, _ = hex.DecodeString(strings.TrimPrefix(txid, "0x"))
-		utxo.TxHash = utils.Reverse(utxo.TxHash)
+		utxo.TxHash = neoutils.Reverse(utxo.TxHash)
 
 		utxo.Index = uint16(u["n"].(float64))
 
@@ -70,7 +71,7 @@ func FetchUTXO(url string, address *neotransaction.Address, assetFilter string) 
 			continue
 		}
 		utxo.AssetID, _ = hex.DecodeString(assetid)
-		utxo.AssetID = utils.Reverse(utxo.AssetID)
+		utxo.AssetID = neoutils.Reverse(utxo.AssetID)
 
 		value := u["value"].(string)
 		v, _ := strconv.ParseFloat(value, 64)

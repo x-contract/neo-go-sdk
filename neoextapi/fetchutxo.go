@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/terender/neo-go-sdk/neoutils"
+	"github.com/x-contract/neo-go-sdk/neoutils"
 
-	"github.com/terender/neo-go-sdk/neotransaction"
+	"github.com/x-contract/neo-go-sdk/neotransaction"
 )
 
 ///////////////////////////////////////////////////////////////////////////

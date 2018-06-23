@@ -6,10 +6,10 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/terender/neo-go-sdk/neocliapi"
+	"github.com/x-contract/neo-go-sdk/neocliapi"
 
-	"github.com/terender/neo-go-sdk/neotransaction"
-	"github.com/terender/neo-go-sdk/neotransaction/OpCode"
+	"github.com/x-contract/neo-go-sdk/neotransaction"
+	"github.com/x-contract/neo-go-sdk/neotransaction/OpCode"
 )
 
 var (

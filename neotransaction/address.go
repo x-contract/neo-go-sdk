@@ -2,7 +2,8 @@ package neotransaction
 
 import (
 	"errors"
-	"github.com/terender/neo-go-sdk/neoutils"
+
+	"github.com/x-contract/neo-go-sdk/neoutils"
 )
 
 // AddressVersion 地址版本号

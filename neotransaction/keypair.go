@@ -7,8 +7,9 @@ import (
 	"encoding/hex"
 	"errors"
 	"math/big"
-	"github.com/terender/neo-go-sdk/neoutils"
 	"strings"
+
+	"github.com/x-contract/neo-go-sdk/neoutils"
 )
 
 // KeyPair 包含一对ECC加密算法的公私钥对

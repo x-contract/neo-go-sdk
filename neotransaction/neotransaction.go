@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 
-	"github.com/terender/neo-go-sdk/neoutils"
+	"github.com/x-contract/neo-go-sdk/neoutils"
 )
 
 // The AssetId of some neo token

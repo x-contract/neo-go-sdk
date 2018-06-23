@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/terender/neo-go-sdk/neotransaction/OpCode"
-	"github.com/terender/neo-go-sdk/neoutils"
+	"github.com/x-contract/neo-go-sdk/neotransaction/OpCode"
+	"github.com/x-contract/neo-go-sdk/neoutils"
 )
 
 // ScriptBuilder NEO 智能合约脚本构建器

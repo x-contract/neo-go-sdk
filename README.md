@@ -13,6 +13,9 @@
     
     go get -u github.com/x-contract/neo-go-sdk
     
+  the sdk depends on golang.org/x/crypto/ripemd160 to work, use the command
+  
+    go get -u golang.org/x/crypto/ripemd160
 
 ## How to use
 

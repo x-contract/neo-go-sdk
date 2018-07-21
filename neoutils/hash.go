@@ -8,7 +8,7 @@ import (
 )
 
 // HASH256 the type of hash value in neo. It's a unit256 big number that length 32 byte
-// AssetId, PublicKey, BlockHash, TransactionHash and other hashes are in HASH256 format
+// PublicKey, BlockHash, TransactionHash and other hashes are in HASH256 format
 type HASH256 []byte
 
 // IsValid 判断一个 HASH256 长度是否有效

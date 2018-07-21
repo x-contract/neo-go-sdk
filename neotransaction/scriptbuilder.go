@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"math/big"
+	"math/rand"
+	"time"
 
 	"github.com/x-contract/neo-go-sdk/neotransaction/OpCode"
 	"github.com/x-contract/neo-go-sdk/neoutils"
@@ -177,4 +179,53 @@ func BuildBasicVerifyScript(keyPair *KeyPair) []byte {
 	VerificationScript[1+len(pubKey)] = 0xac
 
 	return VerificationScript
+}
+
+// BuildCallMethodScript 生成一个合约调用脚本，合约的第一个参数必须是一个字符串
+// withNonce 表示是否要在调用指令前插入一个随机数，这样可以让调用脚本以及所在交易hash值产生变化
+// 如果交易中不包含utxo资产的输入输出及其它可变数据的情况下，多次调用同一个合约的同一个接口
+// 构建出来的交易结构是不变的，因此hash值会冲突，加入随机数可以避免这个冲突
+func BuildCallMethodScript(contractHash neoutils.HASH160, method string, args []interface{}, withNonce bool) ([]byte, error) {
+	sb := ScriptBuilder{}
+	if withNonce {
+		rand.Seed(time.Now().UnixNano())
+		sb.EmitPushNumber(int64(rand.Uint32()))
+		sb.Emit(OpCode.DROP)
+	}
+	for i := len(args) - 1; i >= 0; i-- {
+		arg := args[i]
+		switch v := arg.(type) {
+		case neoutils.HASH256:
+			sb.EmitPushBytes(v)
+		case neoutils.HASH160:
+			sb.EmitPushBytes(v)
+		case []byte:
+			sb.EmitPushBytes(v)
+		case uint64:
+			sb.EmitPushNumber(int64(v))
+		case int64:
+			sb.EmitPushNumber(int64(v))
+		case uint32:
+			sb.EmitPushNumber(int64(v))
+		case int32:
+			sb.EmitPushNumber(int64(v))
+		case uint16:
+			sb.EmitPushNumber(int64(v))
+		case int16:
+			sb.EmitPushNumber(int64(v))
+		case byte:
+			sb.EmitPushNumber(int64(v))
+		case string:
+			sb.EmitPushString(v)
+		case bool:
+			sb.EmitPushBool(v)
+		default:
+			return nil, fmt.Errorf(`BuildCallMethodScript Error: script params[%T] not supported`, v)
+		}
+	}
+	sb.EmitPushNumber(int64(len(args)))
+	sb.Emit(OpCode.PACK)
+	sb.EmitPushString(method)
+	sb.EmitAppCall(contractHash)
+	return sb.Bytes(), nil
 }

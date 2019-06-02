@@ -2,7 +2,6 @@ package neoutils
 
 import (
 	"crypto/sha256"
-	"hash"
 
 	"golang.org/x/crypto/ripemd160"
 )
@@ -39,23 +38,22 @@ func (hash HASH160) Copy() HASH160 {
 	return ret
 }
 
-var sha, ripemd hash.Hash
+//var sha, ripemd hash.Hash
 
 func init() {
-	sha = sha256.New()
-	ripemd = ripemd160.New()
+
 }
 
 // Sha256 get the SHA-256 hash value of b
 func Sha256(b []byte) []byte {
-	sha.Reset()
+	sha := sha256.New()
 	sha.Write(b)
 	return sha.Sum(nil)
 }
 
 // Hash256 get the twice SHA-256 hash value of ba
 func Hash256(ba []byte) []byte {
-	sha.Reset()
+	sha := sha256.New()
 	sha.Write(ba)
 	ba = sha.Sum(nil)
 	sha.Reset()
@@ -65,10 +63,10 @@ func Hash256(ba []byte) []byte {
 
 // Hash160 first calculate SHA-256 hash result of b, then RIPEMD-160 hash of the result
 func Hash160(b []byte) []byte {
-	sha.Reset()
+	sha := sha256.New()
 	sha.Write(b)
 	b = sha.Sum(nil)
-	ripemd.Reset()
+	ripemd := ripemd160.New()
 	ripemd.Write(b)
 	return ripemd.Sum(nil)
 }

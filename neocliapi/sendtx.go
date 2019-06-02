@@ -41,7 +41,7 @@ func SendRawTransaction(url string, rawtx string) bool {
 
 	result, ok := ret[`result`].(bool)
 	if !ok {
-		log.Println("Try sendRawTransaction result not a bool")
+		//log.Println("Try sendRawTransaction result not a bool")
 		return false
 	}
 

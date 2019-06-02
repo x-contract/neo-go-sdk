@@ -64,7 +64,7 @@ func FetchUTXO(url string, address *neotransaction.Address, assetFilter string) 
 	}
 
 	if ret.Result == nil {
-		return nil, fmt.Errorf(`FetchUTXO for address[%v] failed %v`, address.Addr, buff)
+		return nil, fmt.Errorf(`FetchUTXO for address[%v] failed %s`, address.Addr, buff)
 	}
 
 	utxos := make([]*neotransaction.UTXO, 0)
